@@ -1,5 +1,9 @@
+import asyncio
+import sys
 import time
 import uuid
+
+from typing import Any
 
 import numpy as np
 from matplotlib import pyplot as plt
@@ -12,8 +16,38 @@ from mne_lsl.player import PlayerLSL
 from mne_lsl.stream import EpochsStream, StreamLSL
 from hypyp import analyses
 
+from pythonosc.udp_client import SimpleUDPClient
+
+ip = "127.0.0.1"
+port = 5005
+client = SimpleUDPClient(ip, port)
+
+from muselsl import stream, list_muses
+import subprocess
+
+
+muses = list_muses()
+processes = []
+if muses is None or len(muses) < 2:
+    print("找不到兩台 Muse 裝置，請確認 Muse 是否已開啟並配對。")
+    exit(1)
+
+try:
+    for muse in muses:
+        process = subprocess.Popen([
+            sys.executable,
+            "muse_worker.py",
+            muse["address"],
+        ])
+        processes.append(process)
+except:
+    exit(1)
 streams = resolve_streams()
-assert len(streams) == 2
+while streams is None or len(streams) < 2:
+    time.sleep(1)
+    streams = resolve_streams()
+    print("等待兩台 Muse 連線中...")
+
 print(streams[0])
 print(streams[1])
 
@@ -151,9 +185,14 @@ try:
         n_ch = len(a.info['ch_names'])
 # print(n_ch)
         Delta, Theta, Alpha, Beta = coh[:, 0:n_ch, n_ch:2*n_ch] # [0:n_channels, n_channels: 2*n_channels]
-        print(f"{Delta},\n {Theta},\n {Beta},\n {Alpha}")
+        client.send_message("/delta", Delta.mean())
+        client.send_message("/theta", Theta.mean())
+        client.send_message("/alpha", Alpha.mean())
+        client.send_message("/beta", Beta.mean())
         time.sleep(0.5)
-
-finally:
+except KeyboardInterrupt:
+    for process in processes:
+        process.terminate()
     a.disconnect()
     b.disconnect()
+    

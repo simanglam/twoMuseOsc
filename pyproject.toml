@@ -1,0 +1,23 @@
+[project]
+name = "twomuseosc"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+authors = [
+    { name = "Si manglam", email = "qwer09214@gmail.com" }
+]
+requires-python = ">=3.14"
+dependencies = [
+    "hypyp>=0.6.2",
+    "mne-lsl>=1.14.0",
+    "muselsl>=2.5.3",
+    "pyqt6>=6.11.0",
+    "python-osc>=1.10.2",
+]
+
+[project.scripts]
+twomuseosc = "twomuseosc:main"
+
+[build-system]
+requires = ["uv_build>=0.13.0,<0.14.0"]
+build-backend = "uv_build"
