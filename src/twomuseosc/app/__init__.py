@@ -1,9 +1,9 @@
 from PyQt6 import QtWidgets
-from .window import MyWidget
+from .mainWindow import MainWindow
 import sys
 
 if __name__ == '__main__':
     app = QtWidgets.QApplication(sys.argv)
-    Form = MyWidget()
+    Form = MainWindow()
     Form.show()
     sys.exit(app.exec())

@@ -18,6 +18,8 @@ from hypyp import analyses
 
 from pythonosc.udp_client import SimpleUDPClient
 
+if __name__ != "__main__":
+    print("請直接執行 library.py，而不是 import。")
 ip = "127.0.0.1"
 port = 5005
 client = SimpleUDPClient(ip, port)
